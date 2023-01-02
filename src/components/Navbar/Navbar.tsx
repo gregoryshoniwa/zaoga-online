@@ -5,21 +5,29 @@ import { UserContext } from '../../contexts/UserContext';
 import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from './Link';
+import { Home } from '../../pages/sub-pages/Home/Home';
+import { POS } from '../../pages/sub-pages/POS/POS';
+import { Messages } from '../../pages/sub-pages/Messages/Messages';
+import { Reports } from '../../pages/sub-pages/Reports/Reports';
+import { UserAdmin } from '../../pages/sub-pages/UserAdmin/UserAdmin';
+import { MemberAdmin } from '../../pages/sub-pages/MemberAdmin/MemberAdmin';
+import { Settings } from '../../pages/sub-pages/Settings/Settings';
 
-type LinkProps = {
-    status: 'active' | '' ,
-    icon:string,
-    title:string,
+enum Menus{
+    Dashboard,
+    POS,
+    Messages,
+    Reports,
+    UserAdmin,
+    MemberAdmin,
+    Settings
 }
 export const Navbar = () =>{
     const userContext = useContext(UserContext)
     const navigate = useNavigate()
-    const [list, setList] = useState<LinkProps[]>([]);
-
+    const [menu, setMenu] = useState(0);
     
-
-    useEffect(() =>{
-        setList([
+    var NavBarList = [
         {
             status: 'active',
             icon: 'dashboard',
@@ -47,7 +55,7 @@ export const Navbar = () =>{
         },
         {
             status: '',
-            icon: 'person',
+            icon: 'face',
             title: 'Member Admin'
         },
         {
@@ -55,7 +63,11 @@ export const Navbar = () =>{
             icon: 'settings',
             title: 'Settings'
         }
-    ]);
+    ]
+    
+
+    useEffect(() =>{
+        
     },[])
 
     const handleClick = (e: number) => {
@@ -68,7 +80,7 @@ export const Navbar = () =>{
 
         newActive.classList.add("active");
         
-      
+        setMenu(e)
     }
  
     const handleLogout = () => {
@@ -78,6 +90,34 @@ export const Navbar = () =>{
             navigate('/')
         }
        
+    }
+
+    const SelectedMenu = () =>{
+        switch (menu) {
+            case Menus.Dashboard:
+                    return <Home />
+                
+            case Menus.POS:
+                    return <POS />
+
+            case Menus.Messages:
+                    return <Messages />
+                    
+            case Menus.Reports:
+                    return <Reports />
+
+            case Menus.UserAdmin:
+                    return <UserAdmin />
+
+            case Menus.MemberAdmin:
+                    return <MemberAdmin />
+    
+            case Menus.Settings:
+                    return <Settings />     
+        
+            default:
+                break;
+        }
     }
 
     return (
@@ -95,20 +135,24 @@ export const Navbar = () =>{
                 </div>
                 <div className="sidebar">
                     {
-                    list.map((item,i) => 
+                    NavBarList.map((item,i) => 
                             <a key={i} id={`${i}`} href="#" className={item.status} onClick={() => handleClick(i)}>
                                 <Link title={item.title} icon={item.icon} />
                             </a>
                         )
                     }
-                    
-                    
+                                        
                     <a href="#" onClick={ handleLogout }>
                         <span className="material-icons">logout</span>
                         <h3>Logout</h3>
                     </a>
                 </div>
             </aside>
+            <main>
+                {
+                  SelectedMenu()
+                }
+            </main>
         </>
     )
 }
