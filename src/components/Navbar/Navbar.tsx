@@ -1,17 +1,20 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import './Navbar.css';
 import Logo from '../../assets/logo2.png';
+import Avator from '../../assets/avator.jpg';
 import { UserContext } from '../../contexts/UserContext';
 import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from './Link';
+
 import { Home } from '../../pages/sub-pages/Home/Home';
 import { POS } from '../../pages/sub-pages/POS/POS';
 import { Messages } from '../../pages/sub-pages/Messages/Messages';
 import { Reports } from '../../pages/sub-pages/Reports/Reports';
 import { UserAdmin } from '../../pages/sub-pages/UserAdmin/UserAdmin';
-import { MemberAdmin } from '../../pages/sub-pages/MemberAdmin/MemberAdmin';
 import { Settings } from '../../pages/sub-pages/Settings/Settings';
+import { MeetingChats } from '../../pages/sub-pages/MeetingChats/MeetingChats';
+import { Calendar } from '../../pages/sub-pages/Calendar/Calendar';
 
 enum Menus{
     Dashboard,
@@ -19,13 +22,18 @@ enum Menus{
     Messages,
     Reports,
     UserAdmin,
-    MemberAdmin,
+    MeetingChats,
+    Calendar,
     Settings
 }
 export const Navbar = () =>{
     const userContext = useContext(UserContext)
     const navigate = useNavigate()
     const [menu, setMenu] = useState(0);
+
+    
+    
+    
     
     var NavBarList = [
         {
@@ -55,8 +63,13 @@ export const Navbar = () =>{
         },
         {
             status: '',
-            icon: 'face',
-            title: 'Member Admin'
+            icon: 'duo',
+            title: 'Meeting-Chat'
+        },
+        {
+            status: '',
+            icon: 'calendar_month',
+            title: 'Calendar'
         },
         {
             status: '',
@@ -81,6 +94,24 @@ export const Navbar = () =>{
         newActive.classList.add("active");
         
         setMenu(e)
+    }
+
+    const handleClose = () => {
+        var sideMenu:any = document.querySelector("aside");
+        sideMenu.style.display = "none";
+    }
+    const handleOpen = () => {
+        var sideMenu:any = document.querySelector("aside");
+        sideMenu.style.display = "block";
+    }
+
+    const handleToggle = () => {
+        var themeToggler:any = document.querySelector(".theme-toggler");
+    
+        document.body.classList.toggle('dark-theme-variables');
+
+        themeToggler.querySelector('span:nth-child(1)').classList.toggle('active');
+        themeToggler.querySelector('span:nth-child(2)').classList.toggle('active');
     }
  
     const handleLogout = () => {
@@ -109,8 +140,11 @@ export const Navbar = () =>{
             case Menus.UserAdmin:
                     return <UserAdmin />
 
-            case Menus.MemberAdmin:
-                    return <MemberAdmin />
+            case Menus.MeetingChats:
+                    return <MeetingChats />
+
+            case Menus.Calendar:
+                    return <Calendar />
     
             case Menus.Settings:
                     return <Settings />     
@@ -127,10 +161,10 @@ export const Navbar = () =>{
                 <div className="top">
                     <div className="logo">
                         <img src={Logo} alt="logo" />
-                        <h2>ZAOGA<span className="danger">Online</span></h2>
+                        <h2>ZAOGA<span className="danger">Link</span></h2>
                     </div>
-                    <div className="close" id="close-btn">
-                        <span className="material-icons">close</span>
+                    <div className="close" id="close-btn" onClick={handleClose}>
+                        <span className="material-icons" >close</span>
                     </div>
                 </div>
                 <div className="sidebar">
@@ -153,6 +187,106 @@ export const Navbar = () =>{
                   SelectedMenu()
                 }
             </main>
+
+            <div className="right">
+                <div className="top">
+                    <button id="menu-btn" onClick={handleOpen}>
+                        <span className="material-icons">menu</span>
+                    </button>
+                    
+                    <div className="profile">
+                        <div className="theme-toggler" onClick={handleToggle}>
+                            <span className="material-icons active">light_mode</span>
+                            <span className="material-icons">dark_mode</span>
+                        </div>
+                        <div className="profile-photo">
+                            <img src={Avator} alt="avator" />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="recent-updates">
+                    <h2>Recent Updates</h2>
+                    <div className="updates">
+                        <div className="update">
+                            <div className="profile-photo">
+                                <img src={Logo} alt="logo" />
+                            </div>
+                            <div className="message">
+                                <small><b>Blessing Shoniwa</b> received her order from Grebles Investments</small>
+                                <p style={{fontSize:'10px'}} className="text-muted">2 minutes ago</p>
+                            </div>
+                        </div>
+                   
+                        <div className="update">
+                            <div className="profile-photo">
+                                <img src={Logo} alt="logo" />
+                            </div>
+                            <div className="message">
+                                <small><b>Amon Gutu</b> received her order from Grebles Investments</small>
+                                <p style={{fontSize:'10px'}} className="text-muted">3 minutes ago</p>
+                            </div>
+                        </div>
+                    
+                        <div className="update">
+                            <div className="profile-photo">
+                                <img src={Logo} alt="logo" />
+                            </div>
+                            <div className="message">
+                                <small><b>Ryan Nash</b> received her order from Grebles Investments</small>
+                                <p style={{fontSize:'10px'}} className="text-muted">5 minutes ago</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div className="sales-analytics">
+                    <h2>Sales Analytics</h2>
+                    <div className="item online">
+                        <div className="profile-photo">
+                            <img src={Logo} alt="logo" />
+                        </div>
+                        <div className="right">
+                            <div className="info">
+                                <h3>Tithes</h3>
+                                <small className="text-muted">Last 24 hours</small>
+                            </div>
+                            <h5 className="success">+35%</h5>
+                            <h3>3849</h3>
+                        </div>
+                    </div>
+                    <div className="item online">
+                        <div className="profile-photo">
+                            <img src={Logo} alt="logo" />
+                        </div>
+                        <div className="right">
+                            <div className="info">
+                                <h3>Ministry</h3>
+                                <small className="text-muted">Last 24 hours</small>
+                            </div>
+                            <h5 className="danger">-17%</h5>
+                            <h3>1582</h3>
+                        </div>
+                    </div>
+                    <div className="item online">
+                        <div className="profile-photo">
+                            <img src={Logo} alt="logo" />
+                        </div>
+                        <div className="right">
+                            <div className="info">
+                                <h3>Offering</h3>
+                                <small className="text-muted">Last 24 hours</small>
+                            </div>
+                            <h5 className="success">+35%</h5>
+                            <h3>3849</h3>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
         </>
     )
 }

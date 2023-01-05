@@ -5,11 +5,11 @@ type LinkProps = {
     title:string,
     
 }
-export const Link = (props: LinkProps) =>{
+export const Link = ({icon,title}: LinkProps) =>{
     return(
         <>
-            <span className="material-icons">{props.icon}</span>
-            <h3>{props.title}</h3>
+            <span className="material-icons">{icon}</span>
+            <h3>{title}</h3>
         </>
     )
 }
