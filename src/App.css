@@ -181,6 +181,12 @@ b{
         width: 80vw;
     }
 
+    main .pos-section {
+        display: grid;
+        grid-template-columns: repeat(2,2fr);
+        gap: 1.6rem;
+    }
+
 
 }
 

@@ -5,8 +5,6 @@ export type AuthUser = {
     username: string,
     firstname: string,
     lastname: string,
-    role: string,
-    rank: string,
     token: string,
 }
 

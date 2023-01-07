@@ -1,4 +1,7 @@
 import { Insight } from '../../../components/Insight/Insight'
+import { GraphOne } from '../../../graphs/GraphOne'
+import { GraphTwo } from '../../../graphs/GraphTwo'
+
 import './Home.css'
 export const Home = () => {
     return(
@@ -24,10 +27,10 @@ export const Home = () => {
                 <h2>Recent Orders</h2>
                 <div className="graphs">
                     <div className="graph">
-
+                        <GraphTwo />
                     </div>
                     <div className="graph">
-
+                        <GraphOne />
                     </div>
                 </div>
 
