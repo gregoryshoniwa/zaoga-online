@@ -3,7 +3,7 @@ import './Navbar.css';
 import Logo from '../../assets/logo2.png';
 import Avator from '../../assets/avator.jpg';
 import { UserContext } from '../../contexts/UserContext';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from './Link';
 
@@ -15,6 +15,7 @@ import { UserAdmin } from '../../pages/sub-pages/UserAdmin/UserAdmin';
 import { Settings } from '../../pages/sub-pages/Settings/Settings';
 import { MeetingChats } from '../../pages/sub-pages/MeetingChats/MeetingChats';
 import { Calendar } from '../../pages/sub-pages/Calendar/Calendar';
+import { ConfigProvider, theme } from 'antd';
 
 enum Menus{
     Dashboard,
@@ -30,6 +31,7 @@ export const Navbar = () =>{
     const userContext = useContext(UserContext)
     const navigate = useNavigate()
     const [menu, setMenu] = useState(0);
+    const [themeState, setThemeState] = useState('light');
 
     
     
@@ -79,9 +81,7 @@ export const Navbar = () =>{
     ]
     
 
-    useEffect(() =>{
-        
-    },[])
+    
 
     const handleClick = (e: number) => {
         var active:any = document.getElementsByClassName("active");
@@ -112,6 +112,13 @@ export const Navbar = () =>{
 
         themeToggler.querySelector('span:nth-child(1)').classList.toggle('active');
         themeToggler.querySelector('span:nth-child(2)').classList.toggle('active');
+
+        if(themeState === 'light'){
+            setThemeState('dark');
+        }
+        if(themeState === 'dark'){
+            setThemeState('light');
+        }
     }
  
     const handleLogout = () => {
@@ -184,8 +191,22 @@ export const Navbar = () =>{
             </aside>
             <main>
                 {
-                  SelectedMenu()
+                    themeState === 'dark'
+                    ?
+                    <ConfigProvider
+                        theme={{
+                            algorithm : theme.darkAlgorithm
+                        }}
+                    >
+                        {
+                        SelectedMenu()
+                        }
+                    </ConfigProvider>
+                    :
+                    SelectedMenu()
+                    
                 }
+                
             </main>
 
             <div className="right">

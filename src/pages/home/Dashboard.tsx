@@ -13,9 +13,9 @@ export const Dashboard = () => {
             ?
             <div className="container">
                 <Navbar />
-                {/* <div>Dashboard</div>
-                <div>Welcome {userContext?.user?.username}</div>
-                <button onClick={ handleLogout }>logout</button> */}
+                <div>Dashboard</div>
+                {/* <div>Welcome {userContext?.user?.username}</div> */}
+                
             </div>
             
             :

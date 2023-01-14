@@ -1,6 +1,6 @@
 
 import { useNavigate } from 'react-router-dom'
-import { useContext,useEffect, useRef,useState } from 'react';
+import { useCallback, useContext,useEffect, useRef,useState } from 'react';
 
 import { UserContext } from '../../contexts/UserContext';
 
@@ -26,28 +26,28 @@ export const Login = () => {
     const userNameRef = useRef<HTMLInputElement | null>(null);
     const passwordRef = useRef<HTMLInputElement | null>(null);
 
-    const loggedInUserToken = localStorage.getItem("token");
     
-    useEffect(() => {
-       
+      
+    
+    const getStoredUserToken = useCallback(async () =>{
+      const loggedInUserToken = await localStorage.getItem("token");
+      if (loggedInUserToken) {
         
-        if (loggedInUserToken) {
-          const foundUserToken = loggedInUserToken;
-          let decoded:any = jwt_decode(foundUserToken);
-          userContext?.setUser({
-                id: decoded.user.id,
-                username: decoded.user.username,
-                firstname: decoded.user.firstName,
-                lastname: decoded.user.lastName,
-                token: foundUserToken
-            })
-            navigate('home')
-        }
-        
-      }, [navigate, userContext,loggedInUserToken]);
+        let decoded:any = await jwt_decode(loggedInUserToken);
+        await userContext?.setUser({
+              id: decoded.user.id,
+              username: decoded.user.username,
+              firstname: decoded.user.firstName,
+              lastname: decoded.user.lastName,
+              token: `Bearer ${loggedInUserToken}`
+          })
+         await navigate('home')
+         await console.log(userContext)
+      }
+    
+    },[navigate, userContext])
 
-    
-    
+
     const handleLogin = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
         
@@ -76,24 +76,26 @@ export const Login = () => {
 
     const postData = async () => {
       setLoading(true)
-        const postData = {
-            name: "generateToken",
-            param: {
-              username: userNameRef.current?.value,
-              password: passwordRef.current?.value
-            }
-        };
+      const postData = {
+        name: "generateToken",
+        param: {
+          username: userNameRef.current?.value,
+          password: passwordRef.current?.value
+        }
+    };
     
         try {
-          const res = await fetch(`http://zaoga-online.co.zw/api/`, {
-            method: "post",
-            headers: {
-              "Content-Type": "application/json",
-              "x-access-token": "token-value",
-            },
-            body: JSON.stringify(postData),
-          }); 
-          const data = await res.json();
+         
+           const res = await fetch(`http://zaoga-online.co.zw/api/`, {
+            // const res = await fetch(`https://zaoga-online.grebles.co.zw/api/`, {
+              method: "post",
+              headers: {
+                "Content-Type": "application/json",
+                "x-access-token": "token-value",
+              },
+              body: JSON.stringify(postData),
+            }); 
+            const data = await res.json();
           
           if(data.response?.result?.token){
             localStorage.setItem('token',JSON.stringify(data.response.result.token))
@@ -104,10 +106,11 @@ export const Login = () => {
                 username: decoded.user.username,
                 firstname: decoded.user.firstName,
                 lastname: decoded.user.lastName,
-                token: data.response.result.token
+                token: `Bearer ${data.response.result.token}` 
             })
             setLoading(false)
             navigate('home')
+            console.log(userContext)
           }else{
             setLoading(false)
             await userContext?.setUser(null)
@@ -168,6 +171,15 @@ export const Login = () => {
             
         }
       }
+
+
+      useEffect(() => {
+       
+        getStoredUserToken()
+          
+          
+        }, [getStoredUserToken]);
+  
 
     return ( 
       <>
