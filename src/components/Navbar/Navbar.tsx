@@ -2,8 +2,7 @@
 import './Navbar.css';
 import Logo from '../../assets/logo2.png';
 import Avator from '../../assets/avator.jpg';
-import { UserContext } from '../../contexts/UserContext';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from './Link';
 
@@ -16,6 +15,11 @@ import { Settings } from '../../pages/sub-pages/Settings/Settings';
 import { MeetingChats } from '../../pages/sub-pages/MeetingChats/MeetingChats';
 import { Calendar } from '../../pages/sub-pages/Calendar/Calendar';
 import { ConfigProvider, theme } from 'antd';
+import { useDispatch } from 'react-redux';
+
+
+import { logout } from "../../slices/auth";
+
 
 enum Menus{
     Dashboard,
@@ -28,7 +32,8 @@ enum Menus{
     Settings
 }
 export const Navbar = () =>{
-    const userContext = useContext(UserContext)
+    const dispatch = useDispatch();
+
     const navigate = useNavigate()
     const [menu, setMenu] = useState(0);
     const [themeState, setThemeState] = useState('light');
@@ -105,7 +110,7 @@ export const Navbar = () =>{
         sideMenu.style.display = "block";
     }
 
-    const handleToggle = () => {
+    const handleToggle = async () => {
         var themeToggler:any = document.querySelector(".theme-toggler");
     
         document.body.classList.toggle('dark-theme-variables');
@@ -114,21 +119,24 @@ export const Navbar = () =>{
         themeToggler.querySelector('span:nth-child(2)').classList.toggle('active');
 
         if(themeState === 'light'){
-            setThemeState('dark');
+          await setThemeState('dark');
         }
         if(themeState === 'dark'){
-            setThemeState('light');
+          await setThemeState('light');
         }
     }
- 
-    const handleLogout = () => {
-        if(userContext){
-            userContext.setUser(null)
-            localStorage.removeItem("token");
-            navigate('/')
-        }
+
+    
+    const handleLogout = async () => {
+        
+           await dispatch(logout())
+           await localStorage.removeItem("token");
+           await navigate('/')
+        
        
     }
+
+    
 
     const SelectedMenu = () =>{
         switch (menu) {
@@ -191,6 +199,7 @@ export const Navbar = () =>{
             </aside>
             <main>
                 {
+                    
                     themeState === 'dark'
                     ?
                     <ConfigProvider

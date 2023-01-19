@@ -1,21 +1,29 @@
 import { Navigate } from 'react-router-dom'
-import { useContext } from 'react'
-import { UserContext } from '../../contexts/UserContext'
+import { useEffect, useState } from 'react'
 import { Navbar } from '../../components/Navbar/Navbar'
+import { Loader } from '../../components/Loader/Loader'
+import { useSelector } from 'react-redux'
 
 export const Dashboard = () => {
-    const userContext = useContext(UserContext)
+    
+    const { isLoggedIn } = useSelector((state:any) => state.auth);
+   const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        setLoading(false) 
+    }, []);
+  
         
     return (
         <>
+        <Loader text='Process Data .....' loading={loading} />
         {
-            userContext?.user?.token 
+           isLoggedIn
             ?
             <div className="container">
                 <Navbar />
                 <div>Dashboard</div>
-                {/* <div>Welcome {userContext?.user?.username}</div> */}
-                
+               
             </div>
             
             :
