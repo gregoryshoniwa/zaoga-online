@@ -15,10 +15,11 @@ import { Settings } from '../../pages/sub-pages/Settings/Settings';
 import { MeetingChats } from '../../pages/sub-pages/MeetingChats/MeetingChats';
 import { Calendar } from '../../pages/sub-pages/Calendar/Calendar';
 import { ConfigProvider, theme } from 'antd';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 
 import { logout } from "../../slices/auth";
+import { setTheme } from '../../slices/theme';
 
 
 enum Menus{
@@ -36,7 +37,9 @@ export const Navbar = () =>{
 
     const navigate = useNavigate()
     const [menu, setMenu] = useState(0);
-    const [themeState, setThemeState] = useState('light');
+    // const [themeState, setThemeState] = useState('light');
+
+    const { themeState } = useSelector((state:any) => state.theme);
 
     
     
@@ -118,11 +121,12 @@ export const Navbar = () =>{
         themeToggler.querySelector('span:nth-child(1)').classList.toggle('active');
         themeToggler.querySelector('span:nth-child(2)').classList.toggle('active');
 
+        
         if(themeState === 'light'){
-          await setThemeState('dark');
+          dispatch(setTheme('dark'));
         }
         if(themeState === 'dark'){
-          await setThemeState('light');
+          dispatch(setTheme('light'));
         }
     }
 

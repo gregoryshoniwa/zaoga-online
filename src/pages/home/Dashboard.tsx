@@ -22,7 +22,6 @@ export const Dashboard = () => {
             ?
             <div className="container">
                 <Navbar />
-                <div>Dashboard</div>
                
             </div>
             

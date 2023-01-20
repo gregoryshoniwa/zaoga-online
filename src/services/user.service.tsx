@@ -19,11 +19,19 @@ const updateStatus = (data:postDataType) => {
 const restPassword = (data:postDataType) => {
     return axios.post(API_URL, data, { headers: authHeader() });
 };
+const addUser = (data:postDataType) => {
+  return axios.post(API_URL, data, { headers: authHeader() });
+};
+const updateUser = (data:postDataType) => {
+  return axios.post(API_URL, data, { headers: authHeader() });
+};
 
 const userService = {
   getAllUsers,
   updateStatus,
-  restPassword
+  restPassword,
+  addUser,
+  updateUser
 };
 
 export default userService

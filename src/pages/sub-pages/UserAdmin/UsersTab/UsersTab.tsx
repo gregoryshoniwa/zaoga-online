@@ -5,7 +5,7 @@ import {
   KeyOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
-import { Button, Input, InputRef, Space, Table, Tooltip } from "antd";
+import { Button, Input, InputRef, Modal, Space, Table, Tooltip } from "antd";
 import { ColumnType } from "antd/es/table";
 import { ColumnsType, FilterConfirmProps } from "antd/es/table/interface";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -24,11 +24,15 @@ interface DataType {
   active: number;
 }
 
+
 type DataIndex = keyof DataType;
-export const UsersTab = () => {
+export const UsersTab = ({ loader } : any) => {
   const [users, setUsers] = useState<DataType[]>([]);
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
+  const [selectedPage, setSelectedPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
   const searchInput = useRef<InputRef>(null);
 
   const { user } = useSelector((state: any) => state.auth);
@@ -38,9 +42,10 @@ export const UsersTab = () => {
   const getUsers = useCallback(async () => {
     await setLoading(true);
 
-    userService.getAllUsers({ name: "getAllUsers", param: {} }).then(
+    userService.getAllUsers({ name: "getAllUsersPaged", param: {page: selectedPage} }).then(
       (users) => {
-        setUsers(users.data.response.result);
+        setUsers(users.data.response.result.users);
+        setTotalPages(users.data.response.result.totalPages * 7)
         setLoading(false);
       },
       (error) => {
@@ -55,11 +60,11 @@ export const UsersTab = () => {
       }
     );
    
-  }, []);
+  }, [selectedPage]);
 
   useEffect(() => {
     getUsers();
-  }, [getUsers]);
+  }, [getUsers,loader,selectedPage]);
 
   const handleSearch = (
     selectedKeys: string[],
@@ -228,6 +233,7 @@ export const UsersTab = () => {
       ),
   });
 
+  
   const columns: ColumnsType<DataType> = [
     {
       title: "Id",
@@ -295,6 +301,7 @@ export const UsersTab = () => {
           )}
           <Tooltip title="edit">
             <Button
+              onClick={() => handleUpdateUser(record)}
               shape="circle"
               icon={
                 <EditOutlined style={{ fontSize: "12px", color: "#08c" }} />
@@ -314,10 +321,85 @@ export const UsersTab = () => {
     },
   ];
 
+  const [openUsers, setOpenUsers] = useState(false);
+  const [selectedUser, setSelectedUser] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [userName, setUserName] = useState("");
+
+  const handleUpdateUser = (data: any) =>{
+      setSelectedUser(data.id)
+      setFirstName(data.firstName)
+      setLastName(data.lastName)
+      setUserName(data.username)
+      setOpenUsers(true);
+  }
+
+  const updateUser = () => {
+    setLoading(true);
+    const postData = {
+      name: "updateUser",
+      param: {
+        userId : selectedUser,
+        firstName: firstName,
+        lastName: lastName,
+        userName: userName,
+        updated_by: user.id,
+      },
+    };
+    userService.updateUser(postData).then(
+      () => {
+        setLoading(false);
+        setOpenUsers(false);
+        getUsers();
+        Swal.fire({
+          title: "Updating User",
+          text: "You have successfully updated the selected user data.",
+          icon: "success",
+        });
+      },
+      (error) => {
+        const _content =
+          (error.response &&
+            error.response.data &&
+            error.response.data.message) ||
+          error.message ||
+          error.toString();
+          console.log(`Error: ${_content}`);
+          Swal.fire({
+            title: "Updating User",
+            text: "Sorry there was an error updating user data.",
+            icon: "error",
+          });
+          setLoading(false);
+      }
+    );
+  };
+
+
+
   return (
     <>
       <Loader text="Processing user data....." loading={loading} />
-      <Table columns={columns} dataSource={users} />
+      <Modal
+              title="Update User Form"
+              centered
+              open={openUsers}
+              onOk={() => updateUser()}
+              onCancel={() => setOpenUsers(false)}
+              width={500}
+            >
+              <Space
+                direction="vertical"
+                size="middle"
+                style={{ display: "flex" }}
+              >
+                <Input placeholder={"First Name"} value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+                <Input placeholder={"Last Name"} value={lastName} onChange={(e) => setLastName(e.target.value)}/>
+                <Input placeholder={"User Name"} value={userName} onChange={(e) => setUserName(e.target.value)}/>
+              </Space>
+            </Modal>
+      <Table rowKey={record => record.id} columns={columns} dataSource={users} pagination={{pageSize:7,total:totalPages,onChange:(page) =>{setSelectedPage(page)}}}  />
     </>
   );
 };
