@@ -313,13 +313,13 @@ import {
     const [position, setPosition] = useState("");
   
     const handleUpdateMember = (data: any) =>{
-      // console.log(data);
+      console.log(data);
         setSelectedMember(data.id)
         setFirstName(data.firstName)
         setLastName(data.lastName)
         setGender(data.gender)
         setNationalId(data.national_id)
-        setPosition(data.position)
+        setPosition(data.position_id)
         setOpenMembers(true);
     }
   
@@ -389,6 +389,7 @@ import {
                   <Input placeholder={"Nationa Id"} value={nationaId} onChange={(e) => setNationalId(e.target.value)}/>
                   <Select
                     defaultValue="1"
+                    value={gender}
                     style={{ width: '100%' }}
                     onChange={(value1) => setGender(value1)}
                     options={[
@@ -399,6 +400,7 @@ import {
                     />
                     <Select
                     defaultValue="1"
+                    value={position}
                     style={{ width: '100%' }}
                     onChange={(value2) => setPosition(value2)}
                     options={[
