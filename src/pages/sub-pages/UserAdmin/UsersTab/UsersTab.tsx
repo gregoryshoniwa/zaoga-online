@@ -5,7 +5,7 @@ import {
   KeyOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
-import { Button, Input, InputRef, Modal, Space, Table, Tooltip } from "antd";
+import { Button, Input, InputRef, Modal, Select, Space, Table, Tooltip } from "antd";
 import { ColumnType } from "antd/es/table";
 import { ColumnsType, FilterConfirmProps } from "antd/es/table/interface";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -15,6 +15,8 @@ import { Loader } from "../../../../components/Loader/Loader";
 import { useSelector } from "react-redux";
 
 import userService from "../../../../services/user.service";
+import type { SelectProps } from 'antd';
+import authorizationsService from "../../../../services/authorizations.service";
 
 interface DataType {
   id: number;
@@ -32,6 +34,8 @@ export const UsersTab = ({ loader } : any) => {
   const [searchedColumn, setSearchedColumn] = useState("");
   const [selectedPage, setSelectedPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [options, setOptions] = useState<SelectProps['options']>([]);
+  
 
   const searchInput = useRef<InputRef>(null);
 
@@ -62,9 +66,33 @@ export const UsersTab = ({ loader } : any) => {
    
   }, [selectedPage]);
 
+  const getUserTypes = useCallback(async () => {
+    await setLoading(true);
+
+    authorizationsService.getAllUserTypes({ name: "getAllUserTypesPaged", param: {page: selectedPage} }).then(
+      (user_types) => {
+        setOptions(user_types.data.response.result.user_types);
+        
+        setLoading(false);
+      },
+      (error) => {
+        const _content =
+          (error.response &&
+            error.response.data &&
+            error.response.data.message) ||
+          error.message ||
+          error.toString();
+        console.log(`Error: ${_content}`);
+        setLoading(false);
+      }
+    );
+   
+  }, [selectedPage]);
+
   useEffect(() => {
     getUsers();
-  }, [getUsers,loader,selectedPage]);
+    getUserTypes();
+  }, [getUsers,loader,selectedPage,getUserTypes]);
 
   const handleSearch = (
     selectedKeys: string[],
@@ -326,12 +354,17 @@ export const UsersTab = ({ loader } : any) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [userName, setUserName] = useState("");
+  const [gender_u, setGender_U] = useState("1");
+  const [authorizations, setAuthorizations] = useState<string[]>(['1']);
+
 
   const handleUpdateUser = (data: any) =>{
       setSelectedUser(data.id)
       setFirstName(data.firstName)
       setLastName(data.lastName)
       setUserName(data.username)
+      setGender_U(data.gender)
+      setAuthorizations(JSON.parse(data.authorizations))
       setOpenUsers(true);
   }
 
@@ -344,6 +377,8 @@ export const UsersTab = ({ loader } : any) => {
         firstName: firstName,
         lastName: lastName,
         userName: userName,
+        gender: gender_u,
+        authorizations:JSON.stringify(authorizations),
         updated_by: user.id,
       },
     };
@@ -376,7 +411,10 @@ export const UsersTab = ({ loader } : any) => {
     );
   };
 
-
+  const handleChange = (value: string[]) => {
+    setAuthorizations(value);
+     console.log(authorizations);
+  };
 
   return (
     <>
@@ -397,6 +435,25 @@ export const UsersTab = ({ loader } : any) => {
                 <Input placeholder={"First Name"} value={firstName} onChange={(e) => setFirstName(e.target.value)} />
                 <Input placeholder={"Last Name"} value={lastName} onChange={(e) => setLastName(e.target.value)}/>
                 <Input placeholder={"User Name"} value={userName} onChange={(e) => setUserName(e.target.value)}/>
+                <Select
+                    defaultValue="1"
+                    style={{ width: '100%' }}
+                    value={gender_u}
+                    onChange={(value1) => setGender_U(value1)}
+                    options={[
+                        { value: '1', label: 'Male' },
+                        { value: '2', label: 'Female' }  
+                    ]}
+                  />
+                <Select
+                      mode="multiple"
+                      allowClear
+                      value={authorizations}
+                      style={{ width: '100%' }}
+                      placeholder="Please select"
+                      onChange={handleChange}
+                      options={options}
+                    />
               </Space>
             </Modal>
       <Table rowKey={record => record.id} columns={columns} dataSource={users} pagination={{pageSize:7,total:totalPages,onChange:(page) =>{setSelectedPage(page)}}}  />

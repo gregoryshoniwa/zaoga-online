@@ -2,7 +2,7 @@
 import './Navbar.css';
 import Logo from '../../assets/logo2.png';
 import Avator from '../../assets/avator.jpg';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from './Link';
 
@@ -20,10 +20,12 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { logout } from "../../slices/auth";
 import { setTheme } from '../../slices/theme';
+import { LocalHome } from '../../pages/sub-pages/LocalHome/LocalHome';
 
 
 enum Menus{
     Dashboard,
+    LocalHome,
     POS,
     Messages,
     Reports,
@@ -40,56 +42,89 @@ export const Navbar = () =>{
     // const [themeState, setThemeState] = useState('light');
 
     const { themeState } = useSelector((state:any) => state.theme);
-
-    
-    
-    
+    const { user } = useSelector((state:any) => state.auth);
     
     var NavBarList = [
         {
+            authorizations: ['4','5'],
+            id:0,
             status: 'active',
             icon: 'dashboard',
             title: 'Dashboard'
         },
         {
+            authorizations: ['2','3'],
+            id:1,
+            status: 'active',
+            icon: 'dashboard',
+            title: 'Dashboard'
+        },
+        {
+            authorizations: ['1','5'],
+            id:2,
             status: '',
             icon: 'receipt_long',
             title: 'Point of Sale'
         },
         {
+            authorizations: ['2','3','5'],
+            id:3,
             status: '',
             icon: 'mail',
             title: 'Messages'
         },
         {
+            authorizations: ['4','5'],
+            id:4,
             status: '',
             icon: 'insights',
             title: 'Reports'
         },
         {
+            authorizations: ['5'],
+            id:5,
             status: '',
             icon: 'person',
             title: 'User Admin'
         },
         {
+            authorizations: ['2','3','4','5'],
+            id:6,
             status: '',
             icon: 'duo',
             title: 'Meeting-Chat'
         },
         {
+            authorizations: ['2','3','4','5'],
+            id:7,
             status: '',
             icon: 'calendar_month',
             title: 'Calendar'
         },
         {
+            authorizations: ['5'],
+            id:8,
             status: '',
             icon: 'settings',
             title: 'Settings'
-        }
+        },
+        
     ]
     
 
-    
+    useEffect(() => {
+        user.authorizations.forEach((e: any) => {
+            if(e === '1'){
+                setMenu(2)
+            }
+            if(e === '2' || e === '3'){
+                setMenu(1)
+            }
+            if(e === '4' || e === '5'){
+                setMenu(0)
+            }
+        });
+      }, [user.authorizations]);
 
     const handleClick = (e: number) => {
         var active:any = document.getElementsByClassName("active");
@@ -146,6 +181,8 @@ export const Navbar = () =>{
         switch (menu) {
             case Menus.Dashboard:
                     return <Home />
+            case Menus.LocalHome:
+                    return <LocalHome />
                 
             case Menus.POS:
                     return <POS />
@@ -188,8 +225,23 @@ export const Navbar = () =>{
                 </div>
                 <div className="sidebar">
                     {
-                    NavBarList.map((item,i) => 
-                            <a key={i} id={`${i}`} href="#" className={item.status} onClick={() => handleClick(i)}>
+                    NavBarList.filter((item:any) => {
+                        var filtered = [];
+                        for(var arr in item.authorizations){
+                            for(var filter in user.authorizations){
+                                if(item.authorizations[arr] === user.authorizations[filter]){
+                                    filtered.push(item.authorizations[arr].userid);
+                                }
+                            }
+                        }
+                        if(filtered.length > 0){
+                            return true;
+                        }else{
+                            return false;
+                        }
+                    }).map((item,i) => 
+                            
+                            <a key={item.id} id={`${item.id}`} href="#" className={item.status} onClick={() => handleClick(item.id)}>
                                 <Link title={item.title} icon={item.icon} />
                             </a>
                         )

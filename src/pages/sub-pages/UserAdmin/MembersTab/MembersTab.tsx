@@ -14,6 +14,9 @@ import {
   import { useSelector } from "react-redux";
   
   import memberService from "../../../../services/member.service";
+
+  
+
   
   interface DataType {
     id: number;
@@ -37,9 +40,7 @@ import {
     const [totalPages, setTotalPages] = useState(1);
   
     const searchInput = useRef<InputRef>(null);
-  
     const { user } = useSelector((state: any) => state.auth);
-  
     const [loading, setLoading] = useState(false);
   
     const getMembers = useCallback(async () => {
@@ -308,7 +309,7 @@ import {
     const [selectedMember, setSelectedMember] = useState("");
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
-    const [gender, setGender] = useState("");
+    const [gender, setGender] = useState("1");
     const [nationaId, setNationalId] = useState("");
     const [position, setPosition] = useState("");
   
@@ -365,7 +366,8 @@ import {
         }
       );
     };
-  
+
+    
   
   
     return (
@@ -410,6 +412,7 @@ import {
                         { value: '4', label: 'Pastor'},
                     ]}
                     />
+                    
                 </Space>
               </Modal>
         <Table rowKey={record => record.id} columns={columns} dataSource={members} pagination={{pageSize:7,total:totalPages,onChange:(page) =>{setSelectedPage(page)}}}  />

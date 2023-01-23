@@ -50,6 +50,7 @@ const authSlice = createSlice({
                 firstname: user.firstName,
                 lastname: user.lastName,
                 online:true,
+                authorizations: JSON.parse(user.authorizations),
                 token: `Bearer ${action.payload.user}` 
             }
         },
@@ -75,6 +76,7 @@ const authSlice = createSlice({
                 firstname: user.firstName,
                 lastname: user.lastName,
                 online:false,
+                authorizations: JSON.parse(user.authorizations),
                 token: `Bearer ${action.payload}` 
             }
         }

@@ -4,13 +4,16 @@ import { Button, Input, Modal, Select, Space } from "antd";
 import { Tabs } from "antd";
 import { UsersTab } from "./UsersTab/UsersTab";
 import { MembersTab } from "./MembersTab/MembersTab";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 import userService from "../../../services/user.service";
 import Swal from "sweetalert2";
 import { Loader } from "../../../components/Loader/Loader";
 import memberService from "../../../services/member.service";
+import type { SelectProps } from 'antd';
+import authorizationsService from "../../../services/authorizations.service";
+
 
 const tabs = ["Users", "Members", "Pastors"];
 export const UserAdmin = () => {
@@ -25,11 +28,15 @@ export const UserAdmin = () => {
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [gender, setGender] = useState("");
+  const [gender_m, setGender_M] = useState("1");
+  const [gender_u, setGender_U] = useState("1");
   const [nationaId, setNationalId] = useState("");
-  const [position, setPosition] = useState("");
+  const [position, setPosition] = useState("1");
+  const [authorizations, setAuthorizations] = useState<string[]>(['1']);
 
   const [userName, setUserName] = useState("");
+
+  const [options, setOptions] = useState<SelectProps['options']>([]);
 
   enum tabsItems {
     Starter,
@@ -47,6 +54,8 @@ export const UserAdmin = () => {
         firstName: firstName,
         lastName: lastName,
         userName: userName,
+        gender: gender_u,
+        authorizations:JSON.stringify(authorizations),
         password: "123456789",
         created_by: user.id,
       },
@@ -59,6 +68,8 @@ export const UserAdmin = () => {
         setFirstName("");
         setLastName("");
         setUserName("");
+        setGender_U("1")
+        setAuthorizations(['1'])
         Swal.fire({
           title: "Adding New User",
           text: "You have successfully created a new user with the default password.",
@@ -91,7 +102,7 @@ export const UserAdmin = () => {
       param: {
         firstName: firstName,
         lastName: lastName,
-        gender: gender,
+        gender: gender_m,
         national_id:nationaId,
         position_id:position,
         assembly_id : "1",
@@ -106,7 +117,7 @@ export const UserAdmin = () => {
         setFirstName("");
         setLastName("");
         setNationalId("");
-        setGender("1");
+        setGender_M("1");
         setPosition("1");
         Swal.fire({
           title: "Adding New Member",
@@ -130,6 +141,40 @@ export const UserAdmin = () => {
         setLoading(false);
       }
     );
+  };
+
+  const getUserTypes = useCallback(async () => {
+    await setLoading(true);
+
+    authorizationsService.getAllUserTypes({ name: "getAllUserTypesPaged", param: {page: '1'} }).then(
+      (user_types) => {
+        setOptions(user_types.data.response.result.user_types);
+        
+        setLoading(false);
+      },
+      (error) => {
+        const _content =
+          (error.response &&
+            error.response.data &&
+            error.response.data.message) ||
+          error.message ||
+          error.toString();
+        console.log(`Error: ${_content}`);
+        setLoading(false);
+      }
+    );
+   
+  }, []);
+
+  useEffect(() => {
+    
+    getUserTypes();
+  }, [getUserTypes]);
+
+  
+  const handleChange = (value: string[]) => {
+    setAuthorizations(value);
+    
   };
 
   const SelectedTab = (id: any) => {
@@ -166,6 +211,25 @@ export const UserAdmin = () => {
                   value={userName}
                   onChange={(e) => setUserName(e.target.value)}
                 />
+                <Select
+                    defaultValue="1"
+                    value={gender_u}
+                    style={{ width: '100%' }}
+                    onChange={(value1) => setGender_U(value1)}
+                    options={[
+                        { value: '1', label: 'Male' },
+                        { value: '2', label: 'Female' }  
+                    ]}
+                    />
+                <Select
+                      mode="multiple"
+                      allowClear
+                      value={authorizations}
+                      style={{ width: '100%' }}
+                      placeholder="Please select"
+                      onChange={handleChange}
+                      options={options}
+                    />
               </Space>
             </Modal>
             <Space
@@ -200,7 +264,7 @@ export const UserAdmin = () => {
                   <Select
                     defaultValue="1"
                     style={{ width: '100%' }}
-                    onChange={(value1) => setGender(value1)}
+                    onChange={(value1) => setGender_M(value1)}
                     options={[
                         { value: '1', label: 'Male' },
                         { value: '2', label: 'Female' }  
@@ -217,6 +281,7 @@ export const UserAdmin = () => {
                         { value: '4', label: 'Pastor'}
                     ]}
                     />
+                     
                 </Space>
               </Modal>
             <Space
