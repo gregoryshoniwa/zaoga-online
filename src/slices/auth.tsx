@@ -49,6 +49,7 @@ const authSlice = createSlice({
                 username: user.username,
                 firstname: user.firstName,
                 lastname: user.lastName,
+                assembly_id: user.assembly_id,
                 online:true,
                 authorizations: JSON.parse(user.authorizations),
                 token: `Bearer ${action.payload.user}` 
@@ -75,6 +76,7 @@ const authSlice = createSlice({
                 username: user.username,
                 firstname: user.firstName,
                 lastname: user.lastName,
+                assembly_id: user.assembly_id,
                 online:false,
                 authorizations: JSON.parse(user.authorizations),
                 token: `Bearer ${action.payload}` 

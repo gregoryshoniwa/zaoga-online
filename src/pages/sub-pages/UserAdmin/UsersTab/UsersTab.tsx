@@ -69,7 +69,7 @@ export const UsersTab = ({ loader } : any) => {
   const getUserTypes = useCallback(async () => {
     await setLoading(true);
 
-    authorizationsService.getAllUserTypes({ name: "getAllUserTypesPaged", param: {page: selectedPage} }).then(
+    authorizationsService.getAllUserTypes({ name: "getAllUserTypesPaged", param: {page: 1} }).then(
       (user_types) => {
         setOptions(user_types.data.response.result.user_types);
         
@@ -87,7 +87,7 @@ export const UsersTab = ({ loader } : any) => {
       }
     );
    
-  }, [selectedPage]);
+  }, []);
 
   useEffect(() => {
     getUsers();
