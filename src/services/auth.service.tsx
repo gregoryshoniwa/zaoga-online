@@ -1,8 +1,8 @@
 import axios from "axios";
 
-// const API_URL = "http://zaoga-online.co.zw/api/";
+const API_URL = "http://zaoga-online.co.zw/api/";
 
-const API_URL = "https://zaoga-online.grebles.co.zw/api/";
+// const API_URL = "https://zaoga-online.grebles.co.zw/api/";
 
 
 const login = (username:string, password:string) => {
