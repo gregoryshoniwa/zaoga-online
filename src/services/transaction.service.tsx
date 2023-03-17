@@ -13,6 +13,9 @@ type postDataType = {
 const getAllTractions = (data:postDataType) => {
   return axios.post(API_URL, data, { headers: authHeader() });
 };
+const getAllTractionsByFormId = (data:postDataType) => {
+  return axios.post(API_URL, data, { headers: authHeader() });
+};
 const addTransaction = (data:postDataType) => {
   return axios.post(API_URL, data, { headers: authHeader() });
 };
@@ -25,6 +28,7 @@ const updateTransaction = (data:postDataType) => {
 
 const transactionService = {
   getAllTractions,
+  getAllTractionsByFormId,
   addTransaction,
   updateTransaction
 };

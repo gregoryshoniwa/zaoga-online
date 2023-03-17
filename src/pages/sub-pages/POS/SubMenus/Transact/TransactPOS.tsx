@@ -1,7 +1,7 @@
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { Button, Input, Modal, Select, Space, Table, Tooltip } from "antd"
 import { ColumnsType } from "antd/es/table";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import Swal from "sweetalert2";
 import { Loader } from "../../../../../components/Loader/Loader";
@@ -11,18 +11,17 @@ import transactionService from "../../../../../services/transaction.service";
 interface DataType {
     id: number;
     district_product: string;
-    district_product_id: string;
-    currency_id: string;
+    form_id: string;
     currency: string;
     amount: string
-    member_id : string;
-    assembly_id : string
-    member: string;
+    member : string;
     assembly : string
+    
   }
 export const TransactPOS = () => {
 
-    const [transaction, setTransaction] = useState([]);
+    const [transaction, setTransaction] = useState<DataType[]>([]);
+    
     const [members, setMembers] = useState([
         { value: '1', label: 'Gregory Shoniwa' },
         { value: '2', label: 'Michael Shoniwa' },
@@ -60,12 +59,10 @@ export const TransactPOS = () => {
     const [selectedProduct, setSelectedProduct] = useState("1");
     const { user } = useSelector((state: any) => state.auth);
 
-    const handleEditTransaction = (data:any) => {}
-    const handleDeleteTransaction = (data:any) => {}
-
+    
     const addTransaction = () => {
       setLoading(true);
-      setLoadingText("Adding New Transaction ...");
+      
       const d = new Date();
 
       const postData = {
@@ -95,6 +92,7 @@ export const TransactPOS = () => {
         setSelectedProduct("");
         setSelectedMember("");
         setCurrency("");
+        getTransactions();
       },
       (error) => {
         const _content =
@@ -113,9 +111,40 @@ export const TransactPOS = () => {
       }
     );
     }
+
     const openTransactionForm = () => {
         setOpenTransaction(true);
     }
+
+    const getTransactions = useCallback(async () => {
+      await setLoading(true);
+      const d = new Date();
+
+      transactionService.getAllTractionsByFormId({ name: "getAllDistrictTransactionsByFormId", param: {form_id: `${d.getMonth()+1}-${d.getFullYear()}_${user.id}_${user.assembly_id}`} }).then(
+        (form) => {
+          setTransaction(form.data.response.result);
+          
+          setLoading(false);
+        },
+        (error) => {
+          const _content =
+            (error.response &&
+              error.response.data &&
+              error.response.data.message) ||
+            error.message ||
+            error.toString();
+          console.log(`Error: ${_content}`);
+          setLoading(false);
+        }
+      );
+     
+    }, []);
+
+    useEffect(() => {
+      getTransactions();
+      
+    }, [getTransactions]);
+  
     const columns: ColumnsType<DataType> = [
         
         {
@@ -145,42 +174,11 @@ export const TransactPOS = () => {
         },
         {
           title: "Assembly",
-          dataIndex: "assembly_name",
-          key: "assembly_name",
+          dataIndex: "assembly",
+          key: "assembly",
     
           
-        },
-        {
-          title: "Actions",
-          dataIndex: "active",
-          key: "active",
-          width: "20%",
-          render: (record) => (
-            <Space size="middle">
-              
-              <Tooltip title="edit">
-                <Button
-                  onClick={() => handleEditTransaction(record)}
-                  shape="circle"
-                  icon={
-                    <EditOutlined style={{ fontSize: "12px", color: "#08c" }} />
-                  }
-                />
-              </Tooltip>
-              <Tooltip title="edit">
-                <Button
-                  onClick={() => handleDeleteTransaction(record)}
-                  shape="circle"
-                  icon={
-                    <DeleteOutlined style={{ fontSize: "12px", color: "#08c" }} />
-                  }
-                />
-              </Tooltip>
-    
-              
-            </Space>
-          ),
-        },
+        }
       ];
     
     return(
