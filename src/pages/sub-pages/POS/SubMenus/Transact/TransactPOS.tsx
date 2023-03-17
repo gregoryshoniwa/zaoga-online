@@ -2,7 +2,10 @@ import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { Button, Input, Modal, Select, Space, Table, Tooltip } from "antd"
 import { ColumnsType } from "antd/es/table";
 import { useState } from "react";
+import { useSelector } from "react-redux";
+import Swal from "sweetalert2";
 import { Loader } from "../../../../../components/Loader/Loader";
+import transactionService from "../../../../../services/transaction.service";
 
 
 interface DataType {
@@ -23,10 +26,26 @@ export const TransactPOS = () => {
     const [members, setMembers] = useState([
         { value: '1', label: 'Gregory Shoniwa' },
         { value: '2', label: 'Michael Shoniwa' },
+        { value: '3', label: 'Isabel Shoniwa' },
+        { value: '4', label: 'Brian Shoniwa' },
+        { value: '5', label: 'Luke Shoniwa' },
+        { value: '6', label: 'Peter Shoniwa' },
+        { value: '7', label: 'James Shoniwa' },
+        { value: '8', label: 'Ryan Shoniwa' },
+        { value: '9', label: 'Blessing Shoniwa' },
+        { value: '10', label: 'Raphael Shoniwa' },
+        { value: '11', label: 'Kuda Shoniwa' },
+        { value: '12', label: 'Constent Shoniwa' },
+        { value: '13', label: 'Matthew Shoniwa' },
+        { value: '14', label: 'Truth Shoniwa' },
+        { value: '15', label: 'Mark Shoniwa' },
+        { value: '16', label: 'John Shoniwa' },
     ]);
     const [selectedMember, setSelectedMember] = useState("1");
     const [openTransaction, setOpenTransaction] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [loadingText, setLoadingText] = useState("");
+
     const [currency, setCurrency] = useState("1");
     const [amount, setAmount] = useState("");
     const [districtProducts, setDistrictProducts] = useState(
@@ -39,10 +58,61 @@ export const TransactPOS = () => {
         ]
     );
     const [selectedProduct, setSelectedProduct] = useState("1");
+    const { user } = useSelector((state: any) => state.auth);
 
     const handleEditTransaction = (data:any) => {}
     const handleDeleteTransaction = (data:any) => {}
-    const addTransaction = () => {}
+
+    const addTransaction = () => {
+      setLoading(true);
+      setLoadingText("Adding New Transaction ...");
+      const d = new Date();
+
+      const postData = {
+        name: "addDistrictTransaction",
+        param: {
+          user_id: user.id,
+          assembly_id : user.assembly_id,
+          member_id: selectedMember,
+          district_product_id: selectedProduct,
+          currency : currency,
+          amount : amount,
+          form_id : `${d.getMonth()+1}-${d.getFullYear()}_${user.id}_${user.assembly_id}`
+        },
+      };
+
+    transactionService.addTransaction(postData).then(
+      () => {
+        
+        Swal.fire({
+          title: "Adding New Transaction",
+          text: "You have successfully created a new transaction.",
+          icon: "success",
+        });
+        setLoading(false);
+        setOpenTransaction(false)
+        setAmount("")
+        setSelectedProduct("");
+        setSelectedMember("");
+        setCurrency("");
+      },
+      (error) => {
+        const _content =
+          (error.response &&
+            error.response.data &&
+            error.response.data.message) ||
+          error.message ||
+          error.toString();
+        console.log(`Error: ${_content}`);
+        Swal.fire({
+          title: "Adding New Transaction",
+          text: "Sorry there was an error creating a new transaction.",
+          icon: "error",
+        });
+        setLoading(false);
+      }
+    );
+    }
     const openTransactionForm = () => {
         setOpenTransaction(true);
     }
@@ -131,9 +201,13 @@ export const TransactPOS = () => {
                 >
                  <Select
                     defaultValue="1"
-                    
+                    showSearch
+                    value={selectedProduct}
                     style={{ width: '100%' }}
                     onChange={(value1) => setSelectedProduct(value1)}
+                    filterOption={(input, option) =>
+                      (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                    }
                     options={districtProducts}
                     />
 
@@ -149,10 +223,14 @@ export const TransactPOS = () => {
                     ]}
                     />
                     <Select
-                    defaultValue="1"
-                    
+                  
+                    showSearch
                     style={{ width: '100%' }}
+                    value={selectedMember}
                     onChange={(value3) => setSelectedMember(value3)}
+                    filterOption={(input, option) =>
+                      (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                    }
                     options={members}
                     />
                     
