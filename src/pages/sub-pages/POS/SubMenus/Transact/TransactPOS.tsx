@@ -171,13 +171,13 @@ export const TransactPOS = () => {
           title: "Member",
           dataIndex: "member",
           key: "member",
-    
+          responsive: ["sm"]
         },
         {
           title: "Assembly",
           dataIndex: "assembly",
           key: "assembly",
-    
+          responsive: ["sm"]
           
         }
       ];
