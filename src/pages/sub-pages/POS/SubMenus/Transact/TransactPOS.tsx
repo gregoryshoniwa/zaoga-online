@@ -1,11 +1,14 @@
-import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+
 import { Button, Input, Modal, Select, Space, Table, Tooltip } from "antd"
 import { ColumnsType } from "antd/es/table";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import Swal from "sweetalert2";
 import { Loader } from "../../../../../components/Loader/Loader";
 import transactionService from "../../../../../services/transaction.service";
+import "./TransactPOS.scss"
+import Logo from '../../../../../assets/logo.png';
+import ReactToPrint from "react-to-print";
 
 
 interface DataType {
@@ -21,6 +24,8 @@ interface DataType {
 export const TransactPOS = () => {
 
     const [transaction, setTransaction] = useState<DataType[]>([]);
+    const [open, setOpen] = useState(false);
+
     
     const [members, setMembers] = useState([
         { value: '1', label: 'Gregory Shoniwa' },
@@ -43,8 +48,7 @@ export const TransactPOS = () => {
     const [selectedMember, setSelectedMember] = useState("1");
     const [openTransaction, setOpenTransaction] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [loadingText, setLoadingText] = useState("");
-
+   
     const [currency, setCurrency] = useState("1");
     const [amount, setAmount] = useState("");
     const [districtProducts, setDistrictProducts] = useState(
@@ -81,11 +85,7 @@ export const TransactPOS = () => {
     transactionService.addTransaction(postData).then(
       () => {
         
-        Swal.fire({
-          title: "Adding New Transaction",
-          text: "You have successfully created a new transaction.",
-          icon: "success",
-        });
+        
         setLoading(false);
         setOpenTransaction(false)
         setAmount("")
@@ -93,6 +93,7 @@ export const TransactPOS = () => {
         setSelectedMember("");
         setCurrency("");
         getTransactions();
+        showModal()
       },
       (error) => {
         const _content =
@@ -138,7 +139,7 @@ export const TransactPOS = () => {
         }
       );
      
-    }, []);
+    }, [user.assembly_id, user.id]);
 
     useEffect(() => {
       getTransactions();
@@ -180,7 +181,24 @@ export const TransactPOS = () => {
           
         }
       ];
+
+      const showModal = () => {
+        setOpen(true);
+      };
     
+      
+    
+      const handleCancel = () => {
+        setOpen(false);
+        Swal.fire({
+          title: "Adding New Transaction",
+          text: "You have successfully created a new transaction.",
+          icon: "success",
+        });
+      };
+
+    const componentRef = useRef<HTMLInputElement | null>(null);;
+
     return(
         <>
         <Loader text="Processing transaction data....." loading={loading} />
@@ -237,7 +255,218 @@ export const TransactPOS = () => {
                   
                     
                 </Space>
-              </Modal>
+        </Modal>
+
+        <Modal
+            open={open}
+            onOk={handleCancel}
+            onCancel={handleCancel}
+            footer={[
+                
+              ]}
+            >
+
+            <ReactToPrint
+              trigger={() => <Button key="back">Print Member Recepts</Button>}
+              content={() => componentRef.current}
+              onAfterPrint={handleCancel}
+            />
+             
+             <div ref={componentRef} >
+
+                  <br />
+                <div id="invoice-POS">
+
+                      <center id="top">
+                        <img width="50" alt="zaoga-logo" src={Logo}/>
+                        <div className="info"> 
+                          <h2>Member Recept : #10001</h2>
+                        </div>
+                      </center>
+
+
+                      <div id="mid">
+                        <div className="info">
+                          <h2>Contact Info</h2>
+                          <p> 
+                            Address : 13A Pawell Road, Park town<br />
+                            Email   : info@fifmi.org<br />
+                            Phone   : +263 8677 004035<br />
+                          </p>
+                        </div>
+                      </div>
+
+                      <div id="mid">
+                        <div className="info">
+                          <h2>Member Info</h2>
+                          <p> 
+                            Full Name : Gregory Shoniwa<br />
+                            Position : Elder<br />
+                            District : Ezekiel Centre<br />
+                          </p>
+                        </div>
+                      </div>
+
+
+                      <div id="bot">
+
+                          <div id="table">
+                            <table>
+                            <tbody>
+                                <tr className="tabletitle">
+                                  <td className="item"><h2>Item</h2></td>
+                                  <td className="Hours"><h2></h2></td>
+                                  <td className="Rate"><h2>Amount</h2></td>
+                                </tr>
+
+                                <tr className="service">
+                                  <td className="tableitem"><p className="itemtext">Communication</p></td>
+                                  <td className="tableitem"><p className="itemtext"></p></td>
+                                  <td className="tableitem"><p className="itemtext">$375.00</p></td>
+                                </tr>
+
+                                <tr className="service">
+                                  <td className="tableitem"><p className="itemtext">Asset Gathering</p></td>
+                                  <td className="tableitem"><p className="itemtext"></p></td>
+                                  <td className="tableitem"><p className="itemtext">$225.00</p></td>
+                                </tr>
+
+                                <tr className="service">
+                                  <td className="tableitem"><p className="itemtext">Design Development</p></td>
+                                  <td className="tableitem"><p className="itemtext"></p></td>
+                                  <td className="tableitem"><p className="itemtext">$375.00</p></td>
+                                </tr>
+
+                                <tr className="service">
+                                  <td className="tableitem"><p className="itemtext">Animation</p></td>
+                                  <td className="tableitem"><p className="itemtext"></p></td>
+                                  <td className="tableitem"><p className="itemtext">$1500.00</p></td>
+                                </tr>
+
+                                <tr className="service">
+                                  <td className="tableitem"><p className="itemtext">Animation Revisions</p></td>
+                                  <td className="tableitem"><p className="itemtext"></p></td>
+                                  <td className="tableitem"><p className="itemtext">$750.00</p></td>
+                                </tr>
+
+
+                                
+
+                                <tr className="tabletitle">
+                                  <td></td>
+                                  <td className="Rate"><h2>Total</h2></td>
+                                  <td className="payment"><h2>$3,644.25</h2></td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+
+                          <div id="legalcopy">
+                            <p className="legal"><strong>Thank you and may the God of our father truly bless you!</strong> 
+                            </p>
+                          </div>
+
+                      </div>
+
+
+                </div>
+                  <br />
+                <div id="invoice-POS">
+
+                      <center id="top">
+                        <img width="250" alt="zaoga-logo" src={Logo}/>
+                        <div className="info"> 
+                          <h2>Office Recept : #10001</h2>
+                        </div>
+                      </center>
+
+
+                      <div id="mid">
+                        <div className="info">
+                          <h2>Contact Info</h2>
+                          <p> 
+                            Address : 13A Pawell Road, Park town<br />
+                            Email   : info@fifmi.org<br />
+                            Phone   : +263 8677 004035<br />
+                          </p>
+                        </div>
+                      </div>
+
+                      <div id="mid">
+                        <div className="info">
+                          <h2>Member Info</h2>
+                          <p> 
+                            Full Name : Gregory Shoniwa<br />
+                            Position : Elder<br />
+                            District : Ezekiel Centre<br />
+                          </p>
+                        </div>
+                      </div>
+
+
+                      <div id="bot">
+
+                          <div id="table">
+                            <table>
+                            <tbody>
+                                <tr className="tabletitle">
+                                  <td className="item"><h2>Item</h2></td>
+                                  <td className="Hours"><h2></h2></td>
+                                  <td className="Rate"><h2>Amount</h2></td>
+                                </tr>
+
+                                <tr className="service">
+                                  <td className="tableitem"><p className="itemtext">Communication</p></td>
+                                  <td className="tableitem"><p className="itemtext"></p></td>
+                                  <td className="tableitem"><p className="itemtext">$375.00</p></td>
+                                </tr>
+
+                                <tr className="service">
+                                  <td className="tableitem"><p className="itemtext">Asset Gathering</p></td>
+                                  <td className="tableitem"><p className="itemtext"></p></td>
+                                  <td className="tableitem"><p className="itemtext">$225.00</p></td>
+                                </tr>
+
+                                <tr className="service">
+                                  <td className="tableitem"><p className="itemtext">Design Development</p></td>
+                                  <td className="tableitem"><p className="itemtext"></p></td>
+                                  <td className="tableitem"><p className="itemtext">$375.00</p></td>
+                                </tr>
+
+                                <tr className="service">
+                                  <td className="tableitem"><p className="itemtext">Animation</p></td>
+                                  <td className="tableitem"><p className="itemtext"></p></td>
+                                  <td className="tableitem"><p className="itemtext">$1500.00</p></td>
+                                </tr>
+
+                                <tr className="service">
+                                  <td className="tableitem"><p className="itemtext">Animation Revisions</p></td>
+                                  <td className="tableitem"><p className="itemtext"></p></td>
+                                  <td className="tableitem"><p className="itemtext">$750.00</p></td>
+                                </tr>   
+
+                                <tr className="tabletitle">
+                                  <td></td>
+                                  <td className="Rate"><h2>Total</h2></td>
+                                  <td className="payment"><h2>$3,644.25</h2></td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+
+                          <div id="legalcopy">
+                            <p className="legal"><strong>Thank you and may the God of our father truly bless you!</strong> 
+                            </p>
+                          </div>
+
+                      </div>
+
+
+                </div>
+
+             </div>
+              
+          </Modal>
 
             <Space
               direction="vertical"
